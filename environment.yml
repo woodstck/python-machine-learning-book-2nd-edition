@@ -1,0 +1,12 @@
+name: python-machine-learning-book-2nd-edition
+dependencies:
+- python=3.6
+- numpy
+- scikit-learn
+- pandas
+- matplotlib
+- jupyter
+- cython
+- pip:
+  - tensorflow
+  
