@@ -10,6 +10,7 @@ from sklearn.decomposition import PCA
 from matplotlib.colors import ListedColormap
 from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+import scipy
 from scipy.spatial.distance import pdist, squareform
 from scipy import exp
 from scipy.linalg import eigh
@@ -171,7 +172,7 @@ X_test_std = sc.transform(X_test)
 cov_mat = np.cov(X_train_std.T)
 eigen_vals, eigen_vecs = np.linalg.eig(cov_mat)
 
-print('\nEigenvalues \n%s' % eigen_vals)
+print('\n고윳값 \n%s' % eigen_vals)
 
 
 # **Note**: 
@@ -212,11 +213,11 @@ plt.show()
 
 
 
-# Make a list of (eigenvalue, eigenvector) tuples
+# (고윳값, 고유벡터) 튜플의 리스트를 만듭니다
 eigen_pairs = [(np.abs(eigen_vals[i]), eigen_vecs[:, i])
                for i in range(len(eigen_vals))]
 
-# Sort the (eigenvalue, eigenvector) tuples from high to low
+# 높은 값에서 낮은 값으로 (고윳값, 고유벡터) 튜플을 정렬합니다
 eigen_pairs.sort(key=lambda k: k[0], reverse=True)
 
 
@@ -224,7 +225,7 @@ eigen_pairs.sort(key=lambda k: k[0], reverse=True)
 
 w = np.hstack((eigen_pairs[0][1][:, np.newaxis],
                eigen_pairs[1][1][:, np.newaxis]))
-print('Matrix W:\n', w)
+print('투영 행렬 W:\n', w)
 
 
 # **Note**
@@ -307,12 +308,12 @@ plt.show()
 
 def plot_decision_regions(X, y, classifier, resolution=0.02):
 
-    # setup marker generator and color map
+    # 마커와 컬러맵을 준비합니다
     markers = ('s', 'x', 'o', '^', 'v')
     colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
     cmap = ListedColormap(colors[:len(np.unique(y))])
 
-    # plot the decision surface
+    # 결정 경계를 그립니다
     x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
@@ -323,12 +324,12 @@ def plot_decision_regions(X, y, classifier, resolution=0.02):
     plt.xlim(xx1.min(), xx1.max())
     plt.ylim(xx2.min(), xx2.max())
 
-    # plot class samples
+    # 클래스 샘플을 표시합니다
     for idx, cl in enumerate(np.unique(y)):
         plt.scatter(x=X[y == cl, 0], 
                     y=X[y == cl, 1],
                     alpha=0.6, 
-                    c=cmap(idx),
+                    c=cmap.colors[idx],
                     edgecolor='black',
                     marker=markers[idx], 
                     label=cl)
@@ -343,7 +344,7 @@ pca = PCA(n_components=2)
 X_train_pca = pca.fit_transform(X_train_std)
 X_test_pca = pca.transform(X_test_std)
 
-lr = LogisticRegression()
+lr = LogisticRegression(solver='liblinear', multi_class='auto')
 lr = lr.fit(X_train_pca, y_train)
 
 
@@ -406,7 +407,7 @@ for label in range(1, 4):
 
 
 
-d = 13 # number of features
+d = 13 # 특성의 수
 S_W = np.zeros((d, d))
 for label, mv in zip(range(1, 4), mean_vecs):
     class_scatter = np.zeros((d, d))  # scatter matrix for each class
@@ -415,25 +416,25 @@ for label, mv in zip(range(1, 4), mean_vecs):
         class_scatter += (row - mv).dot((row - mv).T)
     S_W += class_scatter                          # sum class scatter matrices
 
-print('Within-class scatter matrix: %sx%s' % (S_W.shape[0], S_W.shape[1]))
+print('클래스 내의 산포 행렬: %sx%s' % (S_W.shape[0], S_W.shape[1]))
 
 
 # Better: covariance matrix since classes are not equally distributed:
 
 
 
-print('Class label distribution: %s' 
+print('클래스 레이블 분포: %s' 
       % np.bincount(y_train)[1:])
 
 
 
 
-d = 13  # number of features
+d = 13  # 특성의 수
 S_W = np.zeros((d, d))
 for label, mv in zip(range(1, 4), mean_vecs):
     class_scatter = np.cov(X_train_std[y_train == label].T)
     S_W += class_scatter
-print('Scaled within-class scatter matrix: %sx%s' % (S_W.shape[0],
+print('스케일 조정된 클래스 내의 산포 행렬: %sx%s' % (S_W.shape[0],
                                                      S_W.shape[1]))
 
 
@@ -442,15 +443,15 @@ print('Scaled within-class scatter matrix: %sx%s' % (S_W.shape[0],
 
 
 mean_overall = np.mean(X_train_std, axis=0)
-d = 13  # number of features
+mean_overall = mean_overall.reshape(d, 1)  # 열 벡터로 만들기
+d = 13  # 특성의 수
 S_B = np.zeros((d, d))
 for i, mean_vec in enumerate(mean_vecs):
     n = X_train[y_train == i + 1, :].shape[0]
-    mean_vec = mean_vec.reshape(d, 1)  # make column vector
-    mean_overall = mean_overall.reshape(d, 1)  # make column vector
+    mean_vec = mean_vec.reshape(d, 1)  # 열 벡터로 만들기
     S_B += n * (mean_vec - mean_overall).dot((mean_vec - mean_overall).T)
 
-print('Between-class scatter matrix: %sx%s' % (S_B.shape[0], S_B.shape[1]))
+print('클래스 간의 산포 행렬: %sx%s' % (S_B.shape[0], S_B.shape[1]))
 
 
 
@@ -483,7 +484,7 @@ eigen_pairs = sorted(eigen_pairs, key=lambda k: k[0], reverse=True)
 
 # Visually confirm that the list is correctly sorted by decreasing eigenvalues
 
-print('Eigenvalues in descending order:\n')
+print('내림차순의 고윳값:\n')
 for eigen_val in eigen_pairs:
     print(eigen_val[0])
 
@@ -511,7 +512,7 @@ plt.show()
 
 w = np.hstack((eigen_pairs[0][1][:, np.newaxis].real,
               eigen_pairs[1][1][:, np.newaxis].real))
-print('Matrix W:\n', w)
+print('행렬 W:\n', w)
 
 
 
@@ -548,7 +549,7 @@ X_train_lda = lda.fit_transform(X_train_std, y_train)
 
 
 
-lr = LogisticRegression()
+lr = LogisticRegression(solver='liblinear', multi_class='auto')
 lr = lr.fit(X_train_lda, y_train)
 
 plot_decision_regions(X_train_lda, y_train, classifier=lr)
@@ -574,6 +575,76 @@ plt.show()
 
 
 
+# ## 사이킷런의 LinearDiscriminantAnalysis 구현 검증
+
+
+
+y_uniq, y_count = np.unique(y_train, return_counts=True)
+priors = y_count / X_train_std.shape[0]
+priors
+
+
+# $\sigma_{jk} = \frac{1}{n} \sum_{i=1}^n (x_j^{(i)}-\mu_j)(x_k^{(i)}-\mu_k)$
+# 
+# $m = \sum_{i=1}^c \frac{n_i}{n} m_i$
+# 
+# $S_W = \sum_{i=1}^c \frac{n_i}{n} S_i = \sum_{i=1}^c \frac{n_i}{n} \Sigma_i$
+
+
+
+s_w = np.zeros((X_train_std.shape[1], X_train_std.shape[1]))
+for i, label in enumerate(y_uniq):
+    # 1/n로 나눈 공분산 행렬을 얻기 위해 bias=True로 지정합니다.
+    s_w += priors[i] * np.cov(X_train_std[y_train == label].T, bias=True)
+
+
+# $ S_B = S_T-S_W = \sum_{i=1}^{c}\frac{n_i}{n}(m_i-m)(m_i-m)^T $
+
+
+
+s_b = np.zeros((X_train_std.shape[1], X_train_std.shape[1]))
+for i, mean_vec in enumerate(mean_vecs):
+    n = X_train_std[y_train == i + 1].shape[0]
+    mean_vec = mean_vec.reshape(-1, 1)
+    s_b += priors[i] * (mean_vec - mean_overall).dot((mean_vec - mean_overall).T)
+
+
+
+
+ei_val, ei_vec = scipy.linalg.eigh(s_b, s_w)
+ei_vec = ei_vec[:, np.argsort(ei_val)[::-1]]
+ei_vec /= np.linalg.norm(ei_vec, axis=0)
+
+
+
+
+lda_eigen = LDA(solver='eigen')
+lda_eigen.fit(X_train_std, y_train)
+
+
+
+
+# 클래스 내의 산포 행렬은 covariance_ 속성에 저장되어 있습니다.
+np.allclose(s_w, lda_eigen.covariance_)
+
+
+
+
+Sb = np.cov(X_train_std.T, bias=True) - lda_eigen.covariance_
+np.allclose(Sb, s_b)
+
+
+
+
+np.allclose(lda_eigen.scalings_[:, :2], ei_vec[:, :2])
+
+
+
+
+np.allclose(lda_eigen.transform(X_test_std), np.dot(X_test_std, ei_vec[:, :2]))
+
+
+
 # # Using kernel principal component analysis for nonlinear mappings
 
 
@@ -588,45 +659,44 @@ plt.show()
 
 def rbf_kernel_pca(X, gamma, n_components):
     """
-    RBF kernel PCA implementation.
+    RBF 커널 PCA 구현
 
-    Parameters
+    매개변수
     ------------
-    X: {NumPy ndarray}, shape = [n_samples, n_features]
+    X: {넘파이 ndarray}, shape = [n_samples, n_features]
         
     gamma: float
-      Tuning parameter of the RBF kernel
+      RBF 커널 튜닝 매개변수
         
     n_components: int
-      Number of principal components to return
+      반환할 주성분 개수
 
-    Returns
+    반환값
     ------------
-     X_pc: {NumPy ndarray}, shape = [n_samples, k_features]
-       Projected dataset   
+     X_pc: {넘파이 ndarray}, shape = [n_samples, k_features]
+       투영된 데이터셋
 
     """
-    # Calculate pairwise squared Euclidean distances
-    # in the MxN dimensional dataset.
+    # MxN 차원의 데이터셋에서 샘플 간의 유클리디안 거리의 제곱을 계산합니다.
     sq_dists = pdist(X, 'sqeuclidean')
 
-    # Convert pairwise distances into a square matrix.
+    # 샘플 간의 거리를 정방 대칭 행렬로 변환합니다.
     mat_sq_dists = squareform(sq_dists)
 
-    # Compute the symmetric kernel matrix.
+    # 커널 행렬을 계산합니다.
     K = exp(-gamma * mat_sq_dists)
 
-    # Center the kernel matrix.
+    # 커널 행렬을 중앙에 맞춥니다.
     N = K.shape[0]
     one_n = np.ones((N, N)) / N
     K = K - one_n.dot(K) - K.dot(one_n) + one_n.dot(K).dot(one_n)
 
-    # Obtaining eigenpairs from the centered kernel matrix
-    # scipy.linalg.eigh returns them in ascending order
+    # 중앙에 맞춰진 커널 행렬의 고윳값과 고유벡터를 구합니다.
+    # scipy.linalg.eigh 함수는 오름차순으로 반환합니다.
     eigvals, eigvecs = eigh(K)
     eigvals, eigvecs = eigvals[::-1], eigvecs[:, ::-1]
 
-    # Collect the top k eigenvectors (projected samples)
+    # 최상위 k 개의 고유벡터를 선택합니다(결과값은 투영된 샘플입니다).
     X_pc = np.column_stack((eigvecs[:, i]
                             for i in range(n_components)))
 
