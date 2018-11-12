@@ -11,6 +11,7 @@ from sklearn.pipeline import make_pipeline
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
@@ -130,11 +131,11 @@ X_train, X_test, y_train, y_test =     train_test_split(X, y,
 
 pipe_lr = make_pipeline(StandardScaler(),
                         PCA(n_components=2),
-                        LogisticRegression(random_state=1))
+                        LogisticRegression(solver='liblinear', random_state=1), memory='./')
 
 pipe_lr.fit(X_train, y_train)
 y_pred = pipe_lr.predict(X_test)
-print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
+print('테스트 정확도: %.3f' % pipe_lr.score(X_test, y_test))
 
 
 
@@ -171,10 +172,10 @@ for k, (train, test) in enumerate(kfold):
     pipe_lr.fit(X_train[train], y_train[train])
     score = pipe_lr.score(X_train[test], y_train[test])
     scores.append(score)
-    print('Fold: %2d, Class dist.: %s, Acc: %.3f' % (k+1,
+    print('폴드: %2d, 클래스 분포: %s, 정확도: %.3f' % (k+1,
           np.bincount(y_train[train]), score))
     
-print('\nCV accuracy: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
+print('\nCV 정확도: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
 
 
 
@@ -185,8 +186,23 @@ scores = cross_val_score(estimator=pipe_lr,
                          y=y_train,
                          cv=10,
                          n_jobs=1)
-print('CV accuracy scores: %s' % scores)
-print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
+print('CV 정확도 점수: %s' % scores)
+print('CV 정확도: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
+
+
+
+
+
+scores = cross_validate(estimator=pipe_lr, 
+                        X=X_train, 
+                        y=y_train, 
+                        scoring=['accuracy'], 
+                        cv=10, 
+                        n_jobs=-1,
+                        return_train_score=False)
+print('CV 정확도 점수: %s' % scores['test_accuracy'])
+print('CV 정확도: %.3f +/- %.3f' % (np.mean(scores['test_accuracy']), 
+                                 np.std(scores['test_accuracy'])))
 
 
 
@@ -204,7 +220,9 @@ print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
 
 
 pipe_lr = make_pipeline(StandardScaler(),
-                        LogisticRegression(penalty='l2', random_state=1))
+                        LogisticRegression(solver='liblinear', 
+                                           penalty='l2', 
+                                           random_state=1))
 
 train_sizes, train_scores, test_scores =                learning_curve(estimator=pipe_lr,
                                X=X_train,
@@ -331,7 +349,7 @@ print(gs.best_params_)
 
 clf = gs.best_estimator_
 clf.fit(X_train, y_train)
-print('Test accuracy: %.3f' % clf.score(X_test, y_test))
+print('테스트 정확도: %.3f' % clf.score(X_test, y_test))
 
 
 
@@ -350,7 +368,7 @@ gs = GridSearchCV(estimator=pipe_svc,
 
 scores = cross_val_score(gs, X_train, y_train, 
                          scoring='accuracy', cv=5)
-print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),
+print('CV 정확도: %.3f +/- %.3f' % (np.mean(scores),
                                       np.std(scores)))
 
 
@@ -364,7 +382,7 @@ gs = GridSearchCV(estimator=DecisionTreeClassifier(random_state=0),
 
 scores = cross_val_score(gs, X_train, y_train, 
                          scoring='accuracy', cv=5)
-print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores), 
+print('CV 정확도: %.3f +/- %.3f' % (np.mean(scores), 
                                       np.std(scores)))
 
 
@@ -481,7 +499,8 @@ print(gs.best_params_)
 
 pipe_lr = make_pipeline(StandardScaler(),
                         PCA(n_components=2),
-                        LogisticRegression(penalty='l2', 
+                        LogisticRegression(solver='liblinear',
+                                           penalty='l2', 
                                            random_state=1, 
                                            C=100.0))
 
@@ -568,7 +587,7 @@ np.mean(y_pred == y_imb) * 100
 
 
 
-print('Number of class 1 samples before:', X_imb[y_imb == 1].shape[0])
+print('샘플링하기 전의 클래스 1의 샘플 개수:', X_imb[y_imb == 1].shape[0])
 
 X_upsampled, y_upsampled = resample(X_imb[y_imb == 1],
                                     y_imb[y_imb == 1],
@@ -576,7 +595,7 @@ X_upsampled, y_upsampled = resample(X_imb[y_imb == 1],
                                     n_samples=X_imb[y_imb == 0].shape[0],
                                     random_state=123)
 
-print('Number of class 1 samples after:', X_upsampled.shape[0])
+print('샘플링한 후의 클래스 1의 샘플 개수:', X_upsampled.shape[0])
 
 
 

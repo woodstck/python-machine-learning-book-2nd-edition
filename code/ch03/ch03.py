@@ -34,6 +34,8 @@ from sklearn.neighbors import KNeighborsClassifier
 
 
 
+# %load_ext watermark
+# %watermark -a "Sebastian Raschka" -u -d -p numpy,pandas,matplotlib,sklearn
 
 
 
@@ -127,7 +129,7 @@ X_test_std = sc.transform(X_test)
 
 
 
-ppn = Perceptron(n_iter=40, eta0=0.1, random_state=1)
+ppn = Perceptron(max_iter=40, eta0=0.1, random_state=1)
 ppn.fit(X_train_std, y_train)
 
 
@@ -484,12 +486,23 @@ plot_decision_regions(X_combined_std,
                       y_combined,
                       classifier=svm, 
                       test_idx=range(105, 150))
+plt.scatter(svm.dual_coef_[0, :], svm.dual_coef_[1, :])
 plt.xlabel('petal length [standardized]')
 plt.ylabel('petal width [standardized]')
 plt.legend(loc='upper left')
 plt.tight_layout()
 #plt.savefig('images/03_11.png', dpi=300)
 plt.show()
+
+
+
+
+svm.coef_
+
+
+
+
+svm.dual_coef_, svm.dual_coef_.shape
 
 
 # ## Alternative implementations in scikit-learn
@@ -564,6 +577,7 @@ svm.fit(X_train_std, y_train)
 
 plot_decision_regions(X_combined_std, y_combined,
                       classifier=svm, test_idx=range(105, 150))
+plt.scatter(svm.dual_coef_[0,:], svm.dual_coef_[1,:])
 plt.xlabel('petal length [standardized]')
 plt.ylabel('petal width [standardized]')
 plt.legend(loc='upper left')
@@ -735,6 +749,11 @@ plt.legend(loc='upper left')
 plt.tight_layout()
 #plt.savefig('images/03_24.png', dpi=300)
 plt.show()
+
+
+
+
+knn.algorithm
 
 
 
