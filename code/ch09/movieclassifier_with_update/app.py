@@ -5,12 +5,15 @@ import sqlite3
 import os
 import numpy as np
 
-# import HashingVectorizer from local dir
+# 로컬 디렉토리에서 HashingVectorizer를 임포트합니다
 from vectorizer import vect
+
+# 로컬 디렉토리에서 업데이트 함수를 임포트합니다
+from update import update_model
 
 app = Flask(__name__)
 
-######## Preparing the Classifier
+######## 분류기 준비
 cur_dir = os.path.dirname(__file__)
 clf = pickle.load(open(os.path.join(cur_dir,
                  'pkl_objects',
@@ -36,7 +39,7 @@ def sqlite_entry(path, document, y):
     conn.commit()
     conn.close()
 
-######## Flask
+######## 플라스크
 class ReviewForm(Form):
     moviereview = TextAreaField('',
                                 [validators.DataRequired(),

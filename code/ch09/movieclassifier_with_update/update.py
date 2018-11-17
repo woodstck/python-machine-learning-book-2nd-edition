@@ -3,12 +3,8 @@ import sqlite3
 import numpy as np
 import os
 
-# import HashingVectorizer from local dir
+# 로컬 디렉토리에서 HashingVectorizer를 임포트합니다
 from vectorizer import vect
-
-# import update function from local dir
-from update import update_model
-
 
 def update_model(db_path, model, batch_size=10000):
 
@@ -39,9 +35,8 @@ db = os.path.join(cur_dir, 'reviews.sqlite')
 
 clf = update_model(db_path=db, model=clf, batch_size=10000)
 
-# Uncomment the following lines if you are sure that
-# you want to update your classifier.pkl file
-# permanently.
+# 영구적으로 classifier.pkl 파일에 반영하려면
+# 다음 코드의 주석을 해제하세요.
 
 # pickle.dump(clf, open(os.path.join(cur_dir,
 #             'pkl_objects', 'classifier.pkl'), 'wb')
