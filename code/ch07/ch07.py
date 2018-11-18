@@ -28,6 +28,7 @@ import pandas as pd
 from sklearn.ensemble import BaggingClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 
 # *Python Machine Learning 2nd Edition* by [Sebastian Raschka](https://sebastianraschka.com), Packt Publishing Ltd. 2017
 # 
@@ -158,22 +159,23 @@ np.argmax(p)
 
 class MajorityVoteClassifier(BaseEstimator, 
                              ClassifierMixin):
-    """ A majority vote ensemble classifier
+    """ 과반수 투표 앙상블 분류기
 
-    Parameters
+    매개변수
     ----------
-    classifiers : array-like, shape = [n_classifiers]
-      Different classifiers for the ensemble
+    classifiers : 배열 타입, 크기 = [n_classifiers]
+      앙상블에 사용할 분류기
 
-    vote : str, {'classlabel', 'probability'} (default='label')
-      If 'classlabel' the prediction is based on the argmax of
-        class labels. Else if 'probability', the argmax of
-        the sum of probabilities is used to predict the class label
-        (recommended for calibrated classifiers).
+    vote : str, {'classlabel', 'probability'}
+      기본값: 'classlabel'
+      'classlabel'이면 예측은 다수인 클래스 레이블의 인덱스가 됩니다.
+      'probability'이면 확률 합이 가장 큰 인덱스로 
+      클래스 레이블을 예측합니다(보정된 분류기에 추천합니다).
 
-    weights : array-like, shape = [n_classifiers], optional (default=None)
-      If a list of `int` or `float` values are provided, the classifiers
-      are weighted by importance; Uses uniform weights if `weights=None`.
+    weights : 배열 타입, 크기 = [n_classifiers]
+      선택사항, 기본값: None
+      `int` 또는 `float` 값의 리스트가 주어지면 분류기가 이 중요도로 가중치됩니다.
+      `weights=None`이면 동일하게 취급합니다.
 
     """
     def __init__(self, classifiers, vote='classlabel', weights=None):
@@ -185,33 +187,34 @@ class MajorityVoteClassifier(BaseEstimator,
         self.weights = weights
 
     def fit(self, X, y):
-        """ Fit classifiers.
+        """ 분류기를 학습합니다.
 
-        Parameters
+        매개변수
         ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Matrix of training samples.
+        X : {배열 타입, 희소 행렬},
+            크기 = [n_samples, n_features]
+            훈련 샘플 행렬
 
-        y : array-like, shape = [n_samples]
-            Vector of target class labels.
+        y : 배열 타입, 크기 = [n_samples]
+            타깃 클래스 레이블 벡터
 
-        Returns
+        반환값
         -------
-        self : object
+        self : 객체
 
         """
         if self.vote not in ('probability', 'classlabel'):
-            raise ValueError("vote must be 'probability' or 'classlabel'"
-                             "; got (vote=%r)"
+            raise ValueError("vote는 'probability' 또는 'classlabel'이어야 합니다."
+                             "; (vote=%r)이 입력되었습니다."
                              % self.vote)
 
         if self.weights and len(self.weights) != len(self.classifiers):
-            raise ValueError('Number of classifiers and weights must be equal'
-                             '; got %d weights, %d classifiers'
+            raise ValueError('분류기 개수와 가중치 개수는 동일해야 합니다.'
+                             '; %d개의 가중치와, %d개의 분류기가 입력되었습니다.'
                              % (len(self.weights), len(self.classifiers)))
 
-        # Use LabelEncoder to ensure class labels start with 0, which
-        # is important for np.argmax call in self.predict
+        # self.predict 메서드에서 np.argmax를 호출할 때 
+        # 클래스 레이블이 0부터 시작되어야 하므로 LabelEncoder를 사용합니다.
         self.lablenc_ = LabelEncoder()
         self.lablenc_.fit(y)
         self.classes_ = self.lablenc_.classes_
@@ -222,24 +225,25 @@ class MajorityVoteClassifier(BaseEstimator,
         return self
 
     def predict(self, X):
-        """ Predict class labels for X.
+        """ X에 대한 클래스 레이블을 예측합니다.
 
-        Parameters
+        매개변수
         ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Matrix of training samples.
+        X : {배열 타입, 희소 행렬},
+            크기 = [n_samples, n_features]
+            샘플 데이터 행렬
 
-        Returns
+        반환값
         ----------
-        maj_vote : array-like, shape = [n_samples]
-            Predicted class labels.
+        maj_vote : 배열 타입, 크기 = [n_samples]
+            예측된 클래스 레이블
             
         """
         if self.vote == 'probability':
             maj_vote = np.argmax(self.predict_proba(X), axis=1)
-        else:  # 'classlabel' vote
+        else:  # 'classlabel' 투표
 
-            #  Collect results from clf.predict calls
+            #  clf.predict 메서드를 사용해 결과를 모읍니다.
             predictions = np.asarray([clf.predict(X)
                                       for clf in self.classifiers_]).T
 
@@ -253,18 +257,20 @@ class MajorityVoteClassifier(BaseEstimator,
         return maj_vote
 
     def predict_proba(self, X):
-        """ Predict class probabilities for X.
+        """ X에 대한 클래스 확률을 예측합니다.
 
-        Parameters
+        매개변수
         ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number of samples and
-            n_features is the number of features.
+        X : {배열 타입, 희소 행렬},
+            크기 = [n_samples, n_features]
+            n_samples는 샘플의 개수이고 n_features는 특성의 개수인
+            샘플 데이터 행렬
 
-        Returns
+        반환값
         ----------
-        avg_proba : array-like, shape = [n_samples, n_classes]
-            Weighted average probability for each class per sample.
+        avg_proba : 배열 타입,
+            크기 = [n_samples, n_classes]
+            샘플마다 가중치가 적용된 클래스의 평균 확률
 
         """
         probas = np.asarray([clf.predict_proba(X)
@@ -273,7 +279,7 @@ class MajorityVoteClassifier(BaseEstimator,
         return avg_proba
 
     def get_params(self, deep=True):
-        """ Get classifier parameter names for GridSearch"""
+        """ GridSearch를 위해서 분류기의 매개변수 이름을 반환합니다"""
         if not deep:
             return super(MajorityVoteClassifier, self).get_params(deep=False)
         else:
@@ -304,7 +310,8 @@ X_train, X_test, y_train, y_test =       train_test_split(X, y,
 
 
 
-clf1 = LogisticRegression(penalty='l2', 
+clf1 = LogisticRegression(solver='liblinear',
+                          penalty='l2', 
                           C=0.001,
                           random_state=1)
 
@@ -323,7 +330,7 @@ pipe3 = Pipeline([['sc', StandardScaler()],
 
 clf_labels = ['Logistic regression', 'Decision tree', 'KNN']
 
-print('10-fold cross validation:\n')
+print('10-겹 교차 검증:\n')
 for clf, label in zip([pipe1, clf2, pipe3], clf_labels):
     scores = cross_val_score(estimator=clf,
                              X=X_train,
@@ -465,7 +472,8 @@ params = {'decisiontreeclassifier__max_depth': [1, 2],
 grid = GridSearchCV(estimator=mv_clf,
                     param_grid=params,
                     cv=10,
-                    scoring='roc_auc')
+                    scoring='roc_auc',
+                    iid=False)
 grid.fit(X_train, y_train)
 
 for r, _ in enumerate(grid.cv_results_['mean_test_score']):
@@ -477,8 +485,8 @@ for r, _ in enumerate(grid.cv_results_['mean_test_score']):
 
 
 
-print('Best parameters: %s' % grid.best_params_)
-print('Accuracy: %.2f' % grid.best_score_)
+print('최적의 매개변수: %s' % grid.best_params_)
+print('정확도: %.2f' % grid.best_score_)
 
 
 # **Note**  
@@ -547,7 +555,7 @@ df_wine.columns = ['Class label', 'Alcohol', 'Malic acid', 'Ash',
 
 # df_wine = pd.read_csv('wine.data', header=None)
 
-# drop 1 class
+# 클래스 1 제외하기
 df_wine = df_wine[df_wine['Class label'] != 1]
 
 y = df_wine['Class label'].values
@@ -688,7 +696,7 @@ y_test_pred = tree.predict(X_test)
 
 tree_train = accuracy_score(y_train, y_train_pred)
 tree_test = accuracy_score(y_test, y_test_pred)
-print('Decision tree train/test accuracies %.3f/%.3f'
+print('결정 트리 train/test 정확도 %.3f/%.3f'
       % (tree_train, tree_test))
 
 ada = ada.fit(X_train, y_train)
@@ -697,7 +705,7 @@ y_test_pred = ada.predict(X_test)
 
 ada_train = accuracy_score(y_train, y_train_pred) 
 ada_test = accuracy_score(y_test, y_test_pred) 
-print('AdaBoost train/test accuracies %.3f/%.3f'
+print('아다부스트 train/test 정확도 %.3f/%.3f'
       % (ada_train, ada_test))
 
 
@@ -714,6 +722,59 @@ f, axarr = plt.subplots(1, 2, sharex='col', sharey='row', figsize=(8, 3))
 for idx, clf, tt in zip([0, 1],
                         [tree, ada],
                         ['Decision tree', 'AdaBoost']):
+    clf.fit(X_train, y_train)
+
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+
+    axarr[idx].contourf(xx, yy, Z, alpha=0.3)
+    axarr[idx].scatter(X_train[y_train == 0, 0],
+                       X_train[y_train == 0, 1],
+                       c='blue', marker='^')
+    axarr[idx].scatter(X_train[y_train == 1, 0],
+                       X_train[y_train == 1, 1],
+                       c='green', marker='o')
+    axarr[idx].set_title(tt)
+
+axarr[0].set_ylabel('Alcohol', fontsize=12)
+plt.text(10.2, -0.5,
+         s='OD280/OD315 of diluted wines',
+         ha='center', va='center', fontsize=12)
+
+plt.tight_layout()
+#plt.savefig('images/07_11.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+# ### Graident Boosting
+
+
+
+
+gbrt = GradientBoostingClassifier(n_iter_no_change=10, random_state=42)
+
+gbrt.fit(X_train, y_train)
+gbrt_train_score = gbrt.score(X_train, y_train)
+gbrt_test_score = gbrt.score(X_test, y_test)
+
+print('앙상블에 사용한 트리 개수 %d' % gbrt.n_estimators_)
+print('그래디언트 부스팅 train/test 정확도 %.3f/%.3f'
+      % (gbrt_train_score, gbrt_test_score))
+
+
+
+
+x_min, x_max = X_train[:, 0].min() - 1, X_train[:, 0].max() + 1
+y_min, y_max = X_train[:, 1].min() - 1, X_train[:, 1].max() + 1
+xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1),
+                     np.arange(y_min, y_max, 0.1))
+
+f, axarr = plt.subplots(1, 2, sharex='col', sharey='row', figsize=(8, 3))
+
+
+for idx, clf, tt in zip([0, 1],
+                        [tree, gbrt],
+                        ['Decision tree', 'GradientBoosting']):
     clf.fit(X_train, y_train)
 
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])

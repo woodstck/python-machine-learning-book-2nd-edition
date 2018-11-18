@@ -20,15 +20,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
+import gzip
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import SGDClassifier
-from sklearn.decomposition import LatentDirichletAllocation
 from distutils.version import LooseVersion as Version
 from sklearn import __version__ as sklearn_version
-
-
-# Added version check for recent scikit-learn 0.18 checks
-
+from sklearn.decomposition import LatentDirichletAllocation
 
 # *Python Machine Learning 2nd Edition* by [Sebastian Raschka](https://sebastianraschka.com), Packt Publishing Ltd. 2017
 # 
@@ -128,8 +125,8 @@ if not os.path.isdir('aclImdb'):
 
 
 
-# change the `basepath` to the directory of the
-# unzipped movie dataset
+# `basepath`를 압축 해제된 영화 리뷰 데이터셋이 있는
+# 디렉토리로 바꾸세요
 
 basepath = 'aclImdb'
 
@@ -139,7 +136,7 @@ df = pd.DataFrame()
 for s in ('test', 'train'):
     for l in ('pos', 'neg'):
         path = os.path.join(basepath, s, l)
-        for file in os.listdir(path):
+        for file in sorted(os.listdir(path)):
             with open(os.path.join(path, file), 
                       'r', encoding='utf-8') as infile:
                 txt = infile.read()
@@ -172,9 +169,14 @@ df = pd.read_csv('movie_data.csv', encoding='utf-8')
 df.head(3)
 
 
+
+
+df.shape
+
+
 # ### Note
 # 
-# If you have problems with creating the `movie_data.csv` file in the previous chapter, you can find a download a zip archive at 
+# If you have problems with creating the `movie_data.csv`, you can find a download a zip archive at 
 # https://github.com/rasbt/python-machine-learning-book-2nd-edition/tree/master/code/ch08/
 
 
@@ -345,6 +347,11 @@ df['review'] = df['review'].apply(preprocessor)
 
 
 
+
+df['review'].map(preprocessor)
+
+
+
 # ## Processing documents into tokens
 
 
@@ -419,13 +426,13 @@ param_grid = [{'vect__ngram_range': [(1, 1)],
               ]
 
 lr_tfidf = Pipeline([('vect', tfidf),
-                     ('clf', LogisticRegression(random_state=0))])
+                     ('clf', LogisticRegression(solver='liblinear', random_state=0))])
 
 gs_lr_tfidf = GridSearchCV(lr_tfidf, param_grid,
                            scoring='accuracy',
                            cv=5,
                            verbose=1,
-                           n_jobs=-1)
+                           n_jobs=1)
 
 
 # **Important Note about `n_jobs`**
@@ -452,38 +459,19 @@ gs_lr_tfidf = GridSearchCV(lr_tfidf, param_grid,
 
 
 
-## @Readers: PLEASE IGNORE THIS CELL
-##
-## This cell is meant to generate more 
-## "logging" output when this notebook is run 
-## on the Travis Continuous Integration
-## platform to test the code as well as
-## speeding up the run using a smaller
-## dataset for debugging
-
-if 'TRAVIS' in os.environ:
-    gs_lr_tfidf.verbose=2
-    X_train = df.loc[:250, 'review'].values
-    y_train = df.loc[:250, 'sentiment'].values
-    X_test = df.loc[25000:25250, 'review'].values
-    y_test = df.loc[25000:25250, 'sentiment'].values
-
-
-
-
 gs_lr_tfidf.fit(X_train, y_train)
 
 
 
 
-print('Best parameter set: %s ' % gs_lr_tfidf.best_params_)
-print('CV Accuracy: %.3f' % gs_lr_tfidf.best_score_)
+print('최적의 매개변수 조합: %s ' % gs_lr_tfidf.best_params_)
+print('CV 정확도: %.3f' % gs_lr_tfidf.best_score_)
 
 
 
 
 clf = gs_lr_tfidf.best_estimator_
-print('Test Accuracy: %.3f' % clf.score(X_test, y_test))
+print('테스트 정확도: %.3f' % clf.score(X_test, y_test))
 
 
 
@@ -502,7 +490,7 @@ X = (y + np.random.randn(25)).reshape(-1, 1)
 
 cv5_idx = list(StratifiedKFold(n_splits=5, shuffle=False, random_state=0).split(X, y))
     
-cross_val_score(LogisticRegression(random_state=123), X, y, cv=cv5_idx)
+cross_val_score(LogisticRegression(solver='liblinear', multi_class='auto', random_state=123), X, y, cv=cv5_idx)
 
 
 # By executing the code above, we created a simple data set of random integers that shall represent our class labels. Next, we fed the indices of 5 cross-validation folds (`cv3_idx`) to the `cross_val_score` scorer, which returned 5 accuracy scores -- these are the 5 accuracy values for the 5 test folds.  
@@ -512,7 +500,7 @@ cross_val_score(LogisticRegression(random_state=123), X, y, cv=cv5_idx)
 
 
 
-gs = GridSearchCV(LogisticRegression(), {}, cv=cv5_idx, verbose=3).fit(X, y) 
+gs = GridSearchCV(LogisticRegression(solver='liblinear', multi_class='auto'), {}, cv=cv5_idx, verbose=3).fit(X, y) 
 
 
 # As we can see, the scores for the 5 folds are exactly the same as the ones from `cross_val_score` earlier.
@@ -528,7 +516,7 @@ gs.best_score_
 
 
 
-cross_val_score(LogisticRegression(), X, y, cv=cv5_idx).mean()
+cross_val_score(LogisticRegression(solver='liblinear', multi_class='auto'), X, y, cv=cv5_idx).mean()
 
 
 # #### End comment.
@@ -538,6 +526,39 @@ cross_val_score(LogisticRegression(), X, y, cv=cv5_idx).mean()
 # # Working with bigger data - online algorithms and out-of-core learning
 
 
+
+# This cell is not contained in the book but
+# added for convenience so that the notebook
+# can be executed starting here, without
+# executing prior code in this notebook
+
+
+
+if not os.path.isfile('movie_data.csv'):
+    if not os.path.isfile('movie_data.csv.gz'):
+        print('Please place a copy of the movie_data.csv.gz'
+              'in this directory. You can obtain it by'
+              'a) executing the code in the beginning of this'
+              'notebook or b) by downloading it from GitHub:'
+              'https://github.com/rasbt/python-machine-learning-'
+              'book-2nd-edition/blob/master/code/ch08/movie_data.csv.gz')
+    else:
+        in_f = gzip.open('movie_data.csv.gz', 'rb')
+        out_f = open('movie_data.csv', 'wb')
+        out_f.write(in_f.read())
+        in_f.close()
+        out_f.close()
+
+
+
+
+
+
+# The `stop` is defined as earlier in this chapter
+# Added it here for convenience, so that this section
+# can be run as standalone without executing prior code
+# in the directory
+stop = stopwords.words('english')
 
 
 def tokenizer(text):
@@ -571,8 +592,9 @@ def get_minibatch(doc_stream, size):
             docs.append(text)
             y.append(label)
     except StopIteration:
-        return None, None
+        pass
     return docs, y
+
 
 
 
@@ -583,18 +605,14 @@ vect = HashingVectorizer(decode_error='ignore',
                          preprocessor=None, 
                          tokenizer=tokenizer)
 
-if Version(sklearn_version) < '0.18':
-    clf = SGDClassifier(loss='log', random_state=1, n_iter=1)
-else:
-    clf = SGDClassifier(loss='log', random_state=1, max_iter=1)
+
+
+
+
+clf = SGDClassifier(loss='log', random_state=1, max_iter=1)
 
 doc_stream = stream_docs(path='movie_data.csv')
 
-
-# **Note**
-# 
-# - You can replace `Perceptron(n_iter, ...)` by `Perceptron(max_iter, ...)` in scikit-learn >= 0.19. The `n_iter` parameter is used here deriberately, because some people still use scikit-learn 0.18.
-# 
 
 
 
@@ -614,7 +632,7 @@ for _ in range(45):
 
 X_test, y_test = get_minibatch(doc_stream, size=5000)
 X_test = vect.transform(X_test)
-print('Accuracy: %.3f' % clf.score(X_test, y_test))
+print('정확도: %.3f' % clf.score(X_test, y_test))
 
 
 
@@ -663,10 +681,15 @@ X = count.fit_transform(df['review'].values)
 
 
 
-lda = LatentDirichletAllocation(n_topics=10,
+lda = LatentDirichletAllocation(n_components=10,
                                 random_state=123,
                                 learning_method='batch')
 X_topics = lda.fit_transform(X)
+
+
+
+
+X_topics.shape
 
 
 
@@ -680,7 +703,7 @@ n_top_words = 5
 feature_names = count.get_feature_names()
 
 for topic_idx, topic in enumerate(lda.components_):
-    print("Topic %d:" % (topic_idx + 1))
+    print("토픽 %d:" % (topic_idx + 1))
     print(" ".join([feature_names[i]
                     for i in topic.argsort()\
                         [:-n_top_words - 1:-1]]))
@@ -706,7 +729,7 @@ for topic_idx, topic in enumerate(lda.components_):
 horror = X_topics[:, 5].argsort()[::-1]
 
 for iter_idx, movie_idx in enumerate(horror[:3]):
-    print('\nHorror movie #%d:' % (iter_idx + 1))
+    print('\n공포 영화 #%d:' % (iter_idx + 1))
     print(df['review'][movie_idx][:300], '...')
 
 
