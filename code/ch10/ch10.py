@@ -153,7 +153,7 @@ df.head()
 
 cols = ['LSTAT', 'INDUS', 'NOX', 'RM', 'MEDV']
 
-sns.pairplot(df[cols], size=2.5)
+sns.pairplot(df[cols], height=2.5)
 plt.tight_layout()
 # plt.savefig('images/10_03.png', dpi=300)
 plt.show()
@@ -274,7 +274,7 @@ print('Intercept: %.3f' % lr.w_[0])
 
 num_rooms_std = sc_x.transform(np.array([[5.0]]))
 price_std = lr.predict(num_rooms_std)
-print("Price in $1000s: %.3f" % sc_y.inverse_transform(price_std))
+print("$1,000 단위 가격: %.3f" % sc_y.inverse_transform(price_std))
 
 
 
@@ -307,14 +307,14 @@ plt.show()
 
 
 
-# adding a column vector of "ones"
+# 1로 채워진 열 벡터 추가
 Xb = np.hstack((np.ones((X.shape[0], 1)), X))
 w = np.zeros(X.shape[1])
 z = np.linalg.inv(np.dot(Xb.T, Xb))
 w = np.dot(z, np.dot(Xb.T, y))
 
-print('Slope: %.3f' % w[1])
-print('Intercept: %.3f' % w[0])
+print('기울기: %.3f' % w[1])
+print('절편: %.3f' % w[0])
 
 
 
@@ -421,10 +421,10 @@ plt.show()
 
 
 
-print('MSE train: %.3f, test: %.3f' % (
+print('훈련 MSE: %.3f, 테스트 MSE: %.3f' % (
         mean_squared_error(y_train, y_train_pred),
         mean_squared_error(y_test, y_test_pred)))
-print('R^2 train: %.3f, test: %.3f' % (
+print('훈련 R^2: %.3f, 테스트 R^2: %.3f' % (
         r2_score(y_train, y_train_pred),
         r2_score(y_test, y_test_pred)))
 
@@ -528,10 +528,10 @@ y_quad_pred = pr.predict(X_quad)
 
 
 
-print('Training MSE linear: %.3f, quadratic: %.3f' % (
+print('훈련 MSE 비교 - 선형 모델: %.3f, 다항 모델: %.3f' % (
         mean_squared_error(y, y_lin_pred),
         mean_squared_error(y, y_quad_pred)))
-print('Training R^2 linear: %.3f, quadratic: %.3f' % (
+print('훈련 R^2 비교 - 선형 모델: %.3f, 다항 모델: %.3f' % (
         r2_score(y, y_lin_pred),
         r2_score(y, y_quad_pred)))
 
@@ -546,13 +546,13 @@ y = df['MEDV'].values
 
 regr = LinearRegression()
 
-# create quadratic features
+# 이차, 삼차 다항식 특성을 만듭니다
 quadratic = PolynomialFeatures(degree=2)
 cubic = PolynomialFeatures(degree=3)
 X_quad = quadratic.fit_transform(X)
 X_cubic = cubic.fit_transform(X)
 
-# fit features
+# 학습된 모델을 그리기 위해 특성 범위를 만듭니다
 X_fit = np.arange(X.min(), X.max(), 1)[:, np.newaxis]
 
 regr = regr.fit(X, y)
@@ -568,7 +568,7 @@ y_cubic_fit = regr.predict(cubic.fit_transform(X_fit))
 cubic_r2 = r2_score(y, regr.predict(X_cubic))
 
 
-# plot results
+# 결과 그래프를 그립니다
 plt.scatter(X, y, label='training points', color='lightgray')
 
 plt.plot(X_fit, y_lin_fit, 
@@ -604,18 +604,18 @@ plt.show()
 X = df[['LSTAT']].values
 y = df['MEDV'].values
 
-# transform features
+# 특성을 변환합니다
 X_log = np.log(X)
 y_sqrt = np.sqrt(y)
 
-# fit features
+# 학습된 모델을 그리기 위해 특성 범위를 만듭니다
 X_fit = np.arange(X_log.min()-1, X_log.max()+1, 1)[:, np.newaxis]
 
 regr = regr.fit(X_log, y_sqrt)
 y_lin_fit = regr.predict(X_fit)
 linear_r2 = r2_score(y_sqrt, regr.predict(X_log))
 
-# plot results
+# 결과 그래프를 그립니다
 plt.scatter(X_log, y_sqrt, label='training points', color='lightgray')
 
 plt.plot(X_fit, y_lin_fit, 
@@ -680,10 +680,10 @@ forest.fit(X_train, y_train)
 y_train_pred = forest.predict(X_train)
 y_test_pred = forest.predict(X_test)
 
-print('MSE train: %.3f, test: %.3f' % (
+print('훈련 MSE: %.3f, 테스트 MSE: %.3f' % (
         mean_squared_error(y_train, y_train_pred),
         mean_squared_error(y_test, y_test_pred)))
-print('R^2 train: %.3f, test: %.3f' % (
+print('훈련 R^2: %.3f, 테스트 R^2: %.3f' % (
         r2_score(y_train, y_train_pred),
         r2_score(y_test, y_test_pred)))
 

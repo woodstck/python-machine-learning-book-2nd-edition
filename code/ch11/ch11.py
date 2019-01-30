@@ -11,7 +11,7 @@ import pandas as pd
 from scipy.spatial.distance import pdist, squareform
 from scipy.cluster.hierarchy import linkage
 from scipy.cluster.hierarchy import dendrogram
-# from scipy.cluster.hierarchy import set_link_color_palette
+from scipy.cluster.hierarchy import set_link_color_palette
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_moons
 from sklearn.cluster import DBSCAN
@@ -344,7 +344,7 @@ pd.DataFrame(row_clusters,
 
 
 # make dendrogram black (part 1/2)
-# set_link_color_palette(['black'])
+set_link_color_palette(['black'])
 
 row_dendr = dendrogram(row_clusters, 
                        labels=labels,
@@ -401,7 +401,7 @@ ac = AgglomerativeClustering(n_clusters=3,
                              affinity='euclidean', 
                              linkage='complete')
 labels = ac.fit_predict(X)
-print('Cluster labels: %s' % labels)
+print('클러스터 레이블: %s' % labels)
 
 
 
@@ -410,7 +410,7 @@ ac = AgglomerativeClustering(n_clusters=2,
                              affinity='euclidean', 
                              linkage='complete')
 labels = ac.fit_predict(X)
-print('Cluster labels: %s' % labels)
+print('클러스터 레이블: %s' % labels)
 
 
 
