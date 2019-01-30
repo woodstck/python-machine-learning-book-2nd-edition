@@ -10,6 +10,7 @@ dependencies:
 - nltk
 - flask
 - wtforms
+- seaborn
 - pip:
   - tensorflow
   - watermark  
