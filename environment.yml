@@ -1,6 +1,6 @@
-name: python-machine-learning-book-2nd-edition
+name: python-ml
 dependencies:
-- python=3.6
+- python=3.7
 - numpy
 - scikit-learn
 - pandas
@@ -12,6 +12,7 @@ dependencies:
 - wtforms
 - seaborn
 - pydot
+- imageio
 - pip:
   - tensorflow
   - watermark  
