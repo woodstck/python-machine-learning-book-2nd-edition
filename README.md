@@ -3,12 +3,11 @@
 ![Python 3.7](https://img.shields.io/badge/Python-3.7-blue.svg)
 ![License](https://img.shields.io/badge/Code%20License-MIT-blue.svg)
 
+2019년 5월 출간, 길벗 출판사
 
-**머신 러닝 교과서**
+이 책은 세바스찬 라시카(Sebastian Raschka)와 바히드 미자리리(Vahid Mirjalili)이 쓴 아마존 베스트 셀러 "[Python Machine Learning](https://www.amazon.com/Python-Machine-Learning-scikit-learn-TensorFlow-ebook/dp/B0742K7HYF/)"의 번역서입니다.
 
-2019년 5월 출간
-
-길벗 출판사
+번역서에 관한 궁금한 점이나 오류가 있다면 깃허브에 이슈를 남겨 주시거나 [블로그](https://bit.ly/2Hn88ZM)를 통해 알려 주세요.
 
 
 ## 목차와 주피터 노트북
@@ -17,7 +16,6 @@
 
 `open_dir` 링크를 클릭하면 [code/](code/) 서브디렉토리 아래에 있는 각 장의 폴더로 이동합니다. 또는 `ipynb` 링크를 클릭해서 바로 주피터 노트북을 열어 볼 수 있습니다.
 
-1. 컴퓨터는 데이터에서 배운다 [[open dir](./code/ch01)] [[ipynb](./code/ch01/ch01.ipynb)] 
 2. 간단한 분류 알고리즘 훈련 [[open dir](./code/ch02)] [[ipynb](./code/ch02/ch02.ipynb)] 
 3. 사이킷런을 타고 떠나는 머신 러닝 분류 모델 투어 [[open dir](./code/ch03)] [[ipynb](./code/ch03/ch03.ipynb)] 
 4. 좋은 훈련 세트 만들기: 데이터 전처리 [[open dir](./code/ch04)] [[ipynb](./code/ch04/ch04.ipynb)] 
@@ -34,4 +32,26 @@
 15. 심층 합성곱 신경망으로 이미지 분류 [[open dir](./code/ch15)] [[ipynb](./code/ch15/ch15.ipynb)] 
 16. 순환 신경망으로 시퀀스 데이터 모델링 [[open dir](./code/ch16)] [[ipynb](./code/ch16/ch16.ipynb)] 
 
---- 
+#### 9장 디렉토리 설명
+
+9장의 플라스크 웹 애플리케이션은 다음과 같습니다:
+
+- `1st_flask_app_1/`: 간단한 플라스크 웹 애플리케이션
+- `1st_flask_app_2/`: `1st_flask_app_1`에서 폼 검증과 렌더링을 확장한 버전
+- `movieclassifier/`: 웹 애플리케이션에 내장한 영화 리뷰 분류기
+- `movieclassifier_with_update/`: `movieclassifier`와 동일하지만 sqlite 데이터베이스에서 업데이트하는 버전
+
+웹 애플리케이션을 실행하려면 각 디렉토리로 이동한 후에 메인 애플리케이션 스크립트를 실행합니다.
+
+    cd ./1st_flask_app_1
+    python3 app.py
+
+터미널에서 다음과 같은 출력을 볼 수 있습니다.
+
+     * Running on http://127.0.0.1:5000/
+     * Restarting with reloader
+
+그다음 웹 브라우저를 열고 터미널에 출려된 주소로 접속하면 웹 애플리케이션을 사용할 수 있습니다.
+
+
+**책에 포함된 라이브 데모는 다음 주소에서 확인할 수 있습니다: http://haesun.pythonanywhere.com/**.
