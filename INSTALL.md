@@ -1,17 +1,3 @@
-Sebastian Raschka, 2017
-
-Python Machine Learning - Code Examples
-
-
-##  Chapter 1: Giving Computers the Ability to Learn from Data
-
-
----
-
-**Chapter 1 does not contain any code examples.**
-
----
-
 ## Installing Python packages
 
 Python is available for all three major operating systems — Microsoft Windows, macOS, and Linux — and the installer, as well as the documentation, can be downloaded from the official Python website: https://www.python.org.
