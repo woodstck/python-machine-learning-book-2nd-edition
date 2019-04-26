@@ -45,11 +45,11 @@
 
 이 책에서 사용하는 주요 파이썬 패키지의 버전은 다음과 같습니다. 코드가 올바르게 실행되려면 여러분이 사용하는 버전이 동일하거나 더 높아야 합니다:
 
-- [NumPy](http://www.numpy.org) >= 1.16.1
+- [NumPy](http://www.numpy.org) >= 1.16.3
 - [SciPy](http://www.scipy.org) >= 1.2.1
 - [scikit-learn](http://scikit-learn.org/stable/) >= 0.20.3
-- [matplotlib](http://matplotlib.org) >= 3.0.2
-- [pandas](http://pandas.pydata.org) >= 0.24.1
+- [matplotlib](http://matplotlib.org) >= 3.0.3
+- [pandas](http://pandas.pydata.org) >= 0.24.2
 
 ## 주피터 노트북
 
