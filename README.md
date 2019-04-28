@@ -14,7 +14,7 @@
 
 **설치와 설정에 대한 도움말은 [INSTALL.md 파일](INSTALL.md)을 참고하세요.**
 
-`open_dir` 링크를 클릭하면 [code/](code/) 서브디렉토리 아래에 있는 각 장의 폴더로 이동합니다. 또는 `ipynb` 링크를 클릭해서 바로 주피터 노트북을 열어 볼 수 있습니다.
+`open_dir` 링크를 클릭하면 [code/](code/) 서브디렉토리 아래에 있는 각 장의 폴더로 이동합니다. 또는 `ipynb` 링크를 클릭해서 바로 주피터 노트북을 열어 볼 수 있습니다. `nbviewer`는 주피터의 노트북 뷰어로 볼 수 있는 링크입니다. `colab`은 구글 코랩(Colab)에서 노트북을 실행할 수 있는 링크입니다.
 
 2. 간단한 분류 알고리즘 훈련 [[open dir](./code/ch02)] [[ipynb](./code/ch02/ch02.ipynb)] [[nbviewer](https://nbviewer.jupyter.org/github/rickiepark/python-machine-learning-book-2nd-edition/blob/master/code/ch02/ch02.ipynb)] [[colab](https://colab.research.google.com/github/rickiepark/python-machine-learning-book-2nd-edition/blob/master/code/ch02/ch02.ipynb)]
 3. 사이킷런을 타고 떠나는 머신 러닝 분류 모델 투어 [[open dir](./code/ch03)] [[ipynb](./code/ch03/ch03.ipynb)] [[nbviewer](https://nbviewer.jupyter.org/github/rickiepark/python-machine-learning-book-2nd-edition/blob/master/code/ch03/ch03.ipynb)] [[colab](https://colab.research.google.com/github/rickiepark/python-machine-learning-book-2nd-edition/blob/master/code/ch03/ch03.ipynb)]
