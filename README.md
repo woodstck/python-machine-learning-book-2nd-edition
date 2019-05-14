@@ -1,7 +1,11 @@
-## 머신 러닝 교과서 with 파이썬, 사이킷런, 텐서플로
+## 머신러닝 교과서 with 파이썬, 사이킷런, 텐서플로
 
 ![Python 3.7](https://img.shields.io/badge/Python-3.7-blue.svg)
+![scikit-learn 2.9](https://img.shields.io/badge/scikit--learn-0.20-red.svg)
+![TensorFlow 2.0.0a](https://img.shields.io/badge/TensorFlow-2.0.0a-orange.svg)
 ![License](https://img.shields.io/badge/Code%20License-MIT-blue.svg)
+
+![머신러닝 교과서](./images/cover.jpg)
 
 2019년 5월 출간, 길벗 출판사
 
