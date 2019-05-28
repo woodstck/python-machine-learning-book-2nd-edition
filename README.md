@@ -1,7 +1,7 @@
 ## 머신러닝 교과서 with 파이썬, 사이킷런, 텐서플로
 
 ![Python 3.7](https://img.shields.io/badge/Python-3.7-blue.svg)
-![scikit-learn 2.9](https://img.shields.io/badge/scikit--learn-0.20-red.svg)
+![scikit-learn 0.20, 0.21.1](https://img.shields.io/badge/scikit--learn-0.20, 0.21.1-red.svg)
 ![TensorFlow 2.0.0a](https://img.shields.io/badge/TensorFlow-2.0.0a-orange.svg)
 ![License](https://img.shields.io/badge/Code%20License-MIT-blue.svg)
 
@@ -11,7 +11,7 @@
 
 이 책은 세바스찬 라시카(Sebastian Raschka)와 바히드 미자리리(Vahid Mirjalili)이 쓴 아마존 베스트 셀러 "[Python Machine Learning](https://www.amazon.com/Python-Machine-Learning-scikit-learn-TensorFlow-ebook/dp/B0742K7HYF/)"의 번역서입니다.
 
-번역서에 관한 궁금한 점이나 오류가 있다면 깃허브에 이슈를 남겨 주시거나 [블로그](https://tensorflow.blog/%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D-%EA%B5%90%EA%B3%BC%EC%84%9C/)를 통해 알려 주세요.
+번역서에 관한 궁금한 점이나 오류가 있다면 깃허브에 이슈를 남겨 주시거나 [블로그](http://bit.ly/2YGxYfQ)를 통해 알려 주세요.
 
 
 ## 목차와 주피터 노트북

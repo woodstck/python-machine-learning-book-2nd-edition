@@ -13,6 +13,7 @@ dependencies:
 - seaborn
 - pydot
 - imageio
+- pydotplus
 - pip:
   - tensorflow==2.0.0.a0
   - watermark  
