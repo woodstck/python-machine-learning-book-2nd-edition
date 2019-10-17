@@ -2,7 +2,7 @@
 
 ![Python 3.7](https://img.shields.io/badge/Python-3.7-blue.svg?style=plastic)
 ![scikit-learn 0.20, 0.21.1](https://img.shields.io/badge/scikit--learn-0.20%20%7C%200.21.1-red.svg?style=plastic)
-![TensorFlow 2.0.0a, 2.0.0b](https://img.shields.io/badge/TensorFlow-2.0.0a%20%7C%202.0.0b-orange.svg?style=plastic)
+![TensorFlow 2.0.0a, 2.0.0b, 2.0.0](https://img.shields.io/badge/TensorFlow-2.0.0a%20%7C%202.0.0b%20%7C%202.0.0-orange.svg?style=plastic)
 ![License](https://img.shields.io/badge/Code%20License-MIT-blue.svg?style=plastic)
 
 ![머신러닝 교과서](./images/cover.jpg)
